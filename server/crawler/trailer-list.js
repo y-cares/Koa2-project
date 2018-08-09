@@ -10,7 +10,7 @@ const sleep = time => new Promise(resolve => {
 })
 
 ;(async () => {
-    console.log('Start visit the target page')
+    console.log('Start visit the trail-list page')
 
     // puppeteer.launch() 创建一个模拟浏览器
     const browser = await puppeteer.launch({

@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer')
 
 // 参数 tags 可为影片类型
 const base = `https://movie.douban.com/subject/`
-const doubanId = 30146756
+const doubanId = 27605698
 
 // promise 的一个定时函数
 const sleep = time => new Promise(resolve => {
@@ -12,7 +12,7 @@ const sleep = time => new Promise(resolve => {
 
 ;(async () => {
     // process.on('message', async movies => {
-        console.log('Start visit the target page')
+        console.log('Start visit the video page')
         // puppeteer.launch() 创建一个模拟浏览器
         const browser = await puppeteer.launch({
             // 传递给浏览器实例的其他参数
@@ -83,7 +83,7 @@ const sleep = time => new Promise(resolve => {
         browser.close()
 
         // 推送到子进程
-        process.send({data})
+        process.send(data)
         process.exit(0)
     // })
 })()

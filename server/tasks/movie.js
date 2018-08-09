@@ -33,5 +33,4 @@ const { resolve } = require('path')
         let result = data.result
         console.log('result: ', result)
     })
-
 })()
