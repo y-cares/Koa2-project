@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "npm run start",
     "start": "node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,6 +15,7 @@
     "child_process": "^1.0.2",
     "koa": "^2.5.2",
     "koa-views": "^6.1.4",
+    "mongoose": "^5.2.8",
     "nanoid": "^1.1.1",
     "pug": "^2.0.3",
     "puppeteer": "^1.6.2",

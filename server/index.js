@@ -4,6 +4,13 @@ const Koa = require('koa')
 // https://pug.bootcss.com/api/getting-started.html
 const views = require('koa-views')
 const { resolve } = require('path')
+const { connect } = require('./databases/init')
+
+
+// 调用 mongoose
+;(async () => {
+    await connect()
+})()
 
 
 const app = new Koa()
