@@ -3,19 +3,27 @@ const Koa = require('koa')
 // 本文采用 pug 模板，因为 pug 模板 可实现继承、模块拆解、定义变量等功能
 // https://pug.bootcss.com/api/getting-started.html
 const views = require('koa-views')
+const mongoose = require('mongoose')
 const { resolve } = require('path')
-const { connect } = require('./databases/init')
+const { connect, initSchemas } = require('./databases/init')
+const router = require('./routes')
 
 
 // 调用 mongoose
 ;(async () => {
     await connect()
+    initSchemas()
+    // require('./tasks/movie')
+    // require('./tasks/api')
+    // require('./tasks/movie')
 })()
 
 
 const app = new Koa()
 
-app.use(views(resolve(__dirname, './views'), {
+app.use(router.routes())
+.use(router.allowedMethods())
+.use(views(resolve(__dirname, './views'), {
     // extension 参数，识别后缀为 pug 的模板文件
     extension: 'pug'
 }))

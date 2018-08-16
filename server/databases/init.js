@@ -1,7 +1,10 @@
 // 初始化脚本
+// mongoose文档：https://cnodejs.org/topic/595d9ad5a4de5625080fe118
 const mongoose = require('mongoose')
+const glob = require('glob')
 // mongo的本地地址
 const db = 'mongodb://localhost/douban-trailer'
+const {resolve} = require('path')
 // 链接次数限制
 let maxConnecTimes = 0
 
@@ -39,16 +42,14 @@ exports.connect = () => {
         })
         // 打开链接
         mongoose.connection.once('open', () => {
-            // const Dog = mongoose.model('Dog', {name: String})
-            // const doga = new Dog({name: '阿尔法'})
-            // doga.save().then(() => {
-            //     console.log('汪')
-            // })
             resolve()
             console.log('MongoDB Connected Successfully!')
         })
     })
 }
 
-
+exports.initSchemas = () => {
+    // 获取 schema 文件夹下所有的js文件
+    glob.sync(resolve(__dirname, './schema/', '**/*.js')).forEach(require)
+}
 

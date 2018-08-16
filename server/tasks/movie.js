@@ -4,6 +4,9 @@
 // http://nodejs.cn/api/child_process.html#child_process_child_process_fork_modulepath_args_options
 const cp = require('child_process')
 const { resolve } = require('path')
+// 将数据储存到 mongoose
+const mongoose = require('mongoose')
+const Movie = mongoose.model('Movie')
 
 ;(async () => {
     const script = resolve(__dirname, '../crawler/trailer-list')
@@ -32,5 +35,18 @@ const { resolve } = require('path')
     child.on('message', data => {
         let result = data.result
         console.log('result: ', result)
+        // 将数据填充到数据库
+        result.forEach(async item => {
+            // 判断数据是否被存储过
+            let movie = await Movie.findOne({
+                doubanId: item.doubanId
+            })
+
+            // 储存数据
+            if (!movie) {
+                movie = new Movie(item)
+                await movie.save()
+            }
+        })
     })
 })()
