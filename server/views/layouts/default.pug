@@ -1,14 +1,9 @@
 doctype html
 html
-    head
-        meta(charset="UTF-8")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        meta(http-equiv="X-UA-Compatible", content="ie=edge")
-        block title
-        //- 包含（include）功能允许您把另外的文件内容插入进来。
-        include ../includes/style
-    body
-        //- Pug 支持使用 block 和 extends 关键字进行模板的继承
-        //- 一个称之为“块”（block）的代码块，可以被子模板覆盖、替换。这个过程是递归的。
-        block content
-        
+ head
+  meta(charset="utf-8")
+  meta(name='viewport', content='width=device-width, initial-scale=1')
+  block title
+  include ../includes/style
+ body
+  block content

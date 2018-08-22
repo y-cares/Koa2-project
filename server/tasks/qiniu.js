@@ -5,6 +5,8 @@ const qiniu = require('qiniu')
 // 生成随机的id，作为静态资源的文件名
 const nanoid = require('nanoid')
 const config = require('../config')
+const mongoose = require('mongoose')
+const Movie = mongoose.model('Movie')
 
 const bucket = config.qiniu.bucket
 // 客户端上传凭证
@@ -31,18 +33,28 @@ const uploadToQiniu = async (url, key)=> {
 }
 
 ;(async () => {
-    // 预告片视频信息
-    const movies = [{
-        // 预告片地址
-        video: 'http://vt1.doubanio.com/201808041139/7328a671b34993c1c44144b9e4e0951d/view/movie/M/402340328.mp4',
-        // 预告片id 
-        doubanId: 27605698,
-        // 海报
-        poster: 'https://img1.doubanio.com/view/photo/l_ratio_poster/public/p2529206747.jpg',
-        // 视频封面图
-        cover: 'https://img3.doubanio.com/img/trailer/medium/2529132152.jpg?1532683675'
-    }]
-    movies.map(async movie => {
+    // // 预告片视频信息
+    // const movies = [{
+    //     // 预告片地址
+    //     video: 'http://vt1.doubanio.com/201808041139/7328a671b34993c1c44144b9e4e0951d/view/movie/M/402340328.mp4',
+    //     // 预告片id 
+    //     doubanId: 27605698,
+    //     // 海报
+    //     poster: 'https://img1.doubanio.com/view/photo/l_ratio_poster/public/p2529206747.jpg',
+    //     // 视频封面图
+    //     cover: 'https://img3.doubanio.com/img/trailer/medium/2529132152.jpg?1532683675'
+    // }]
+    let movies = await Movie.find({
+        $or: [
+          { videoKey: { $exists: false } },
+          { videoKey: null },
+          { videoKey: '' }
+        ]
+    })
+
+
+    for (let i = 0; i < [movies[0]].length; i++) {
+        let movie = movies[i]
         if (movie.video && !movie.key) {
             try {
                 console.log('开始上传 video')
@@ -68,6 +80,6 @@ const uploadToQiniu = async (url, key)=> {
                 console.log(err)
             }
         }
-    })
+    }
 })()
 

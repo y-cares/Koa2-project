@@ -3,32 +3,74 @@
 // http://nodejs.cn/api/child_process.html#child_process_child_process_fork_modulepath_args_options
 const cp = require('child_process')
 const { resolve } = require('path')
+const mongoose = require('mongoose')
+const Movie = mongoose.model('Movie')
+const Category = mongoose.model('Category')
 
 ;(async () => {
-    const script = resolve(__dirname, '../crawler/video')
-    // cp.fork() 根据路径返回子进程对象
-    const child = cp.fork(script, [])
-    // 辨别爬虫脚本是否执行
-    let incoked = false
+  let movies = await Movie.find({
+    $or: [
+      { video: { $exists: false } },
+      { video: null }
+    ]
+  })
 
-    // 当进程出错的时候
-    child.on('error', err => {
-        if (incoked) return
-        incoked = true
-        console.log('err: ', err)
+  const script = resolve(__dirname, '../crawler/video')
+  // cp.fork() 根据路径返回子进程对象
+  const child = cp.fork(script, [])
+  let invoked = false
+
+  child.on('error', err => {
+    if (invoked) return
+
+    invoked = true
+
+    console.log(err)
+  })
+
+  child.on('exit', code => {
+    if (invoked) return
+
+    invoked = true
+    let err = code === 0 ? null : new Error('exit code ' + code)
+
+    console.log(err)
+  })
+
+  child.on('message', async data => {
+    let doubanId = data.doubanId
+    let movie = await Movie.findOne({
+      doubanId: doubanId
     })
 
-    // 当进程退出的时候
-    child.on('exit', code => {
-        if (incoked) return
-        incoked = true
+    if (data.video) {
+      movie.video = data.video
+      movie.cover = data.cover
 
-        const err = code === 0 ? null : new Error('exit code' + code)
-        console.log('exit: ', err)
-    })
+      await movie.save()
+    } else {
+      await movie.remove()
 
-    // 消息的获取
-    child.on('message', data => {
-        console.log('message: ', data)
-    })
+      let movieTypes = movie.movieTypes
+
+      for (let i = 0; i < movieTypes.length; i++) {
+        let type = movieTypes[i]
+        let cat = Category.findOne({
+          name: type
+        })
+
+        if (cat && cat.movies) {
+          let idx = cat.movies.indexOf(movie._id)
+
+          if (idx > -1) {
+            cat.movies = cat.movies.splice(idx, 1)
+          }
+
+          await cat.save()
+        }
+      }
+    }
+  })
+
+  child.send(movies)
 })()

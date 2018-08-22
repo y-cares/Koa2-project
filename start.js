@@ -4,4 +4,4 @@
 require('babel-core/register')()
 require('babel-polyfill')
 // 被执行的文件
-require('./test/dec.js')
+require('./server/index.js')
